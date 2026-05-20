@@ -1,25 +1,35 @@
+from pathlib import Path
+
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+
+from backend.routes import products
+
 app = FastAPI()
 
-#just for frontend
-from fastapi.middleware.cors import CORSMiddleware
+FRONTEND_DIR = Path(__file__).resolve().parent / "frontend"
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://127.0.0.1:5500",
+        "http://localhost:5500",
         "http://localhost:8000",
-        "https://product-inventory-system-1.onrender.com"
+        "http://127.0.0.1:8000",
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+app.include_router(products.router, prefix="/api", tags=["Products"])
 
-from backend.routes import products
 
-app.include_router(products.router,prefix="/api",tags=["Products"])
+@app.get("/", include_in_schema=False)
+async def serve_frontend():
+    """Serve the inventory UI from the same deployment as the API."""
+    return FileResponse(FRONTEND_DIR / "index.html")
 # books_data={
 #     1:{
       
