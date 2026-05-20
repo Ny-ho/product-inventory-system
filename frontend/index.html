@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management</title>
+    <style>
+        /* 🎨 CSS: Modern Dark Theme */
+        :root {
+            --bg-color: #1e1e2e;
+            --card-bg: #2a2a35;
+            --text-main: #cdd6f4;
+            --text-muted: #a6adc8;
+            --primary: #89b4fa;
+            --danger: #f38ba8;
+            --success: #a6e3a1;
+            --border: #45475a;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 { margin-bottom: 20px; color: var(--primary); }
+
+        .container {
+            width: 100%;
+            max-width: 850px;
+        }
+
+        /* 📑 Tab Buttons Navigation Layout */
+        .tab-menu {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 10px;
+            width: 100%;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 16px;
+            font-weight: 600;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: 0.2s;
+            border-radius: 6px;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            background-color: rgba(137, 180, 250, 0.15);
+        }
+
+        /* 📦 Content Cards Configuration */
+        .tab-content {
+            display: none; /* Hidden by default */
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            border: 1px solid var(--border);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block; /* Visible when active */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-size: 14px;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+        }
+
+        button.action-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            background-color: var(--primary);
+            color: #11111b;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button.action-btn:hover { filter: brightness(1.1); }
+        button.btn-danger { background-color: var(--danger); color: white; }
+
+        /* 📋 Table Structure Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th { color: var(--text-muted); font-weight: 600; }
+        tr:hover { background-color: rgba(255, 255, 255, 0.02); }
+    </style>
+</head>
+<body>
+
+    <h1>📦 Inventory Management - Products</h1>
+
+    <div class="container">
+        <div class="tab-menu">
+            <button class="tab-btn active" onclick="switchTab(event, 'view-tab')">📋 View Products</button>
+            <button class="tab-btn" onclick="switchTab(event, 'add-tab')">➕ Add Product</button>
+            <button class="tab-btn" onclick="switchTab(event, 'update-tab')">✏️ Update Product</button>
+            <button class="tab-btn" onclick="switchTab(event, 'delete-tab')">🗑️ Delete Product</button>
+        </div>
+
+        <div id="view-tab" class="tab-content active">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3>📋 Current Stock Rows</h3>
+                <button class="action-btn" onclick="fetchProducts()">🔄 Refresh</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    </tbody>
+            </table>
+        </div>
+
+        <div id="add-tab" class="tab-content">
+            <h3>➕ Add New Product</h3>
+            <div class="form-group">
+                <label>Product Name</label>
+                <input type="text" id="add-name" placeholder="Enter product identifier name...">
+                
+                <label>Category</label>
+                <input type="text" id="add-category" placeholder="e.g., Electronics, Book, Clothing...">
+                
+                <label>Price</label>
+                <input type="number" id="add-price" placeholder="0.00" step="0.01" min="0.01">
+                
+                <label>Stock Quantity</label>
+                <input type="number" id="add-stock" placeholder="0" step="1" min="0">
+            </div>
+            <button class="action-btn" onclick="addProduct()">Add Product</button>
+        </div>
+
+        <div id="update-tab" class="tab-content">
+            <h3>✏️ Update Product Details</h3>
+            <div class="form-group">
+                <label>Target Product ID</label>
+                <input type="number" id="update-id" placeholder="Enter product primary key ID to edit..." min="1">
+                
+                <label>New Price (Optional)</label>
+                <input type="number" id="update-price" placeholder="Leave blank to skip variable price shift..." step="0.01" min="0.01">
+                
+                <label>New Stock (Optional)</label>
+                <input type="number" id="update-stock" placeholder="Leave blank to skip adjustments..." step="1" min="0">
+            </div>
+            <button class="action-btn" onclick="updateProduct()">Update Product</button>
+        </div>
+
+        <div id="delete-tab" class="tab-content">
+            <h3>🗑️ Remove Product From Database</h3>
+            <div class="form-group">
+                <label>🔢 Enter Product ID to Delete</label>
+                <input type="number" id="delete-id" placeholder="Ex: 5" min="1">
+            </div>
+            <button class="action-btn btn-danger" onclick="deleteProduct()">🗑️ Delete Product</button>
+        </div>
+    </div>
+
+    <script>
+        // Localhost FastAPI location configuration
+        const BASE_URL = "http://127.0.0.1:8000/api";
+
+        // 🔀 JavaScript Interface Navigation Controller
+        function switchTab(event, tabId) {
+            // Remove active states from all tabs
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+            // Activate target tab layouts
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+
+            // Auto-refresh layout logs if checking the main view list
+            if(tabId === 'view-tab') fetchProducts();
+        }
+
+        // 1. READ (GET All Products)
+        async function fetchProducts() {
+            try {
+                const response = await fetch(`${BASE_URL}/products`);
+                const products = await response.json();
+                
+                const tableBody = document.getElementById('table-body');
+                tableBody.innerHTML = ''; 
+
+                if (products.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--text-muted);">⚠️ No products found in database registry.</td></tr>';
+                    return;
+                }
+
+                products.forEach(p => {
+                    const row = `<tr>
+                        <td>${p.id}</td>
+                        <td><strong>${p.name}</strong></td>
+                        <td>${p.category}</td>
+                        <td>$${parseFloat(p.price).toFixed(2)}</td>
+                        <td>${p.stock}</td>
+                    </tr>`;
+                    tableBody.innerHTML += row;
+                });
+            } catch (error) {
+                console.error("Connection failure details:", error);
+            }
+        }
+
+        // 2. CREATE (POST New Item)
+        async function addProduct() {
+            const name = document.getElementById('add-name').value;
+            const category = document.getElementById('add-category').value;
+            const price = parseFloat(document.getElementById('add-price').value);
+            const stock = parseInt(document.getElementById('add-stock').value);
+
+            if (!name || !category || isNaN(price) || isNaN(stock)) {
+                alert("⚠️ Please fill out all creation parameters completely.");
+                return;
+            }
+
+            const response = await fetch(`${BASE_URL}/products`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, category, price, stock })
+            });
+
+            const result = await response.json();
+            alert(result.message || "✅ Execution completed!");
+
+            // Reset input values
+            document.getElementById('add-name').value = '';
+            document.getElementById('add-category').value = '';
+            document.getElementById('add-price').value = '';
+            document.getElementById('add-stock').value = '';
+        }
+
+        // 3. UPDATE (PUT Custom Partial Parameters)
+        async function updateProduct() {
+            const id = document.getElementById('update-id').value;
+            const priceInput = document.getElementById('update-price').value;
+            const stockInput = document.getElementById('update-stock').value;
+
+            if (!id) {
+                alert("⚠️ Primary key Target ID entry is required.");
+                return;
+            }
+
+            const data = {};
+            if (priceInput !== '') data.price = parseFloat(priceInput);
+            if (stockInput !== '') data.stock = parseInt(stockInput);
+
+            if (Object.keys(data).length === 0) {
+                alert("⚠️ Provide at least one modification argument (Price or Stock).");
+                return;
+            }
+
+            const response = await fetch(`${BASE_URL}/products/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+            alert(result.message || "✅ Field parameters synchronized!");
+
+            document.getElementById('update-id').value = '';
+            document.getElementById('update-price').value = '';
+            document.getElementById('update-stock').value = '';
+        }
+
+        // 4. DELETE (Drop Database Entries)
+        async function deleteProduct() {
+            const id = document.getElementById('delete-id').value;
+
+            if (!id) {
+                alert("⚠️ Target row key ID is required to process drops.");
+                return;
+            }
+
+            const confirmSafety = window.confirm(`⚠️ Are you sure you want to drop entry ID: ${id}?`);
+            if (!confirmSafety) return;
+
+            const response = await fetch(`${BASE_URL}/product/${id}`, { method: "DELETE" });
+            const result = await response.json();
+            
+            alert(result.message || "🗑️ Target row removed.");
+            document.getElementById('delete-id').value = '';
+        }
+
+        // Boot action settings
+        window.onload = fetchProducts;
+    </script>
+</body>
+</html>
