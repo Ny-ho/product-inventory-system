@@ -6,10 +6,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["
-    "http://127.0.0.1:5500",
+    allow_origins=[
+        "http://127.0.0.1:5500",
         "http://localhost:8000",
-        "https://your-frontend-name.onrender.com"],  # Allows your HTML file to connect
+        "https://product-inventory-system-1.onrender.com"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
