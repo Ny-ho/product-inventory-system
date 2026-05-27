@@ -15,10 +15,10 @@ A full-stack inventory management dashboard featuring a high-performance FastAPI
 ## Screenshots
 
 ### View Inventory
-![Inventory Dashboard](./assets/view-products.png)
+![View Inventory](./view-products.png)
 
 ### Add Product
-![Add Product Form](./assets/add-product.png)
+![Add Product Form](./add-product.png)
 
 ## Getting Started
 (Add instructions here on how to clone and run your project, e.g.)
